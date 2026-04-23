@@ -1,13 +1,22 @@
 ﻿#Requires -Version 5.0
-# healthcheck_client.ps1 — Rapport sécurité Windows autonome (support N1)
+# SysHealthCheck.ps1 — Rapport sécurité Windows autonome (support N1)
 # Aucune dépendance externe. Produit rapport_securite_AAAA-MM-JJ_HHMM.html sur le Bureau.
+# Clé AbuseIPDB : fichier "abuseipdb.key" dans le même dossier que l'exe, ou variable d'env ABUSEIPDB_API_KEY.
 
 Set-StrictMode -Off
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-$ABUSEIPDB_KEY  = '833e79cc91c3f650b84bacf0435c6957ffd78289bb2f1267ea6486ece72a8b738571b569629aa3b1'
+# ── Clé AbuseIPDB ─────────────────────────────────────────────────────────────
+$keyFile = Join-Path (Split-Path $MyInvocation.MyCommand.Path) 'abuseipdb.key'
+$ABUSEIPDB_KEY = ''
+if (Test-Path $keyFile) {
+    $ABUSEIPDB_KEY = (Get-Content $keyFile -Raw).Trim()
+} elseif ($env:ABUSEIPDB_API_KEY) {
+    $ABUSEIPDB_KEY = $env:ABUSEIPDB_API_KEY
+} else {
+    $ABUSEIPDB_KEY = Read-Host 'Clé API AbuseIPDB (laisser vide pour ignorer)'
+}
 $MAX_ABUSE_IPS  = 20
 $HIGH_RISK_CC   = @('CN','RU','KP','IR','SY','CU','VE','BY','NG','PK','MM')
 $C2_PORTS       = @(4444,1234,31337,6666,8888,9999,12345,54321,65535,1337,6667)
