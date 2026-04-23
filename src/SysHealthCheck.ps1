@@ -8,7 +8,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # ── Clé AbuseIPDB ─────────────────────────────────────────────────────────────
-$keyFile = Join-Path $PSScriptRoot 'abuseipdb.key'
+$exeDir  = Split-Path ([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
+$keyFile = Join-Path $exeDir 'abuseipdb.key'
 $ABUSEIPDB_KEY = ''
 if (Test-Path $keyFile) {
     $ABUSEIPDB_KEY = (Get-Content $keyFile -Raw).Trim()
@@ -397,7 +398,7 @@ $html = $html -replace '(?s)const PROCS_SUSPECTS = \[.*?\];',     "const PROCS_S
 $html = $html -replace "(?s)const sysinfo = \[.*?\];",            "const sysinfo = [`n    $sysinfoContent`n  ];"
 
 # ── Écriture ──────────────────────────────────────────────────────────────────
-$outDir  = $PSScriptRoot
+$outDir  = $exeDir
 $outFile = "rapport_securite_$(Get-Date -Format 'yyyy-MM-dd_HHmm').html"
 $outPath = Join-Path $outDir $outFile
 $utf8bom = New-Object System.Text.UTF8Encoding $true
