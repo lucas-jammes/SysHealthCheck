@@ -1,0 +1,722 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Healthcheck — PC-LUCAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:        oklch(8%  0.018 255);
+  --surface:   oklch(12% 0.020 255);
+  --surface2:  oklch(17% 0.020 255);
+  --surface3:  oklch(21% 0.018 255);
+  --border:    oklch(24% 0.020 255);
+  --text:      oklch(93% 0.008 255);
+  --text-dim:  oklch(50% 0.015 255);
+  --text-mid:  oklch(72% 0.010 255);
+  --critique:     oklch(65% 0.22  25); --critique-bg:  oklch(16% 0.07  25); --critique-brd: oklch(27% 0.10  25);
+  --eleve:        oklch(80% 0.17  62); --eleve-bg:     oklch(17% 0.06  62); --eleve-brd:    oklch(28% 0.09  62);
+  --moyen:        oklch(88% 0.20  82); --moyen-bg:     oklch(19% 0.06  82); --moyen-brd:    oklch(30% 0.11  82);
+  --info:         oklch(70% 0.17 250); --info-bg:      oklch(17% 0.06 250); --info-brd:     oklch(28% 0.10 250);
+  --green:        oklch(68% 0.17 145); --green-bg:     oklch(17% 0.06 145); --green-brd:    oklch(28% 0.10 145);
+  --sidebar-w: 20vw; --right-w: 20vw;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Roboto', sans-serif;
+}
+[data-light] {
+  --bg: oklch(96% 0.005 255); --surface: oklch(100% 0 0); --surface2: oklch(94% 0.006 255);
+  --surface3: oklch(90% 0.006 255); --border: oklch(87% 0.008 255);
+  --text: oklch(13% 0.015 255); --text-dim: oklch(48% 0.012 255); --text-mid: oklch(33% 0.012 255);
+  --critique-bg: oklch(97% 0.03 25); --critique-brd: oklch(80% 0.12 25);
+  --eleve-bg: oklch(97% 0.03 50); --eleve-brd: oklch(80% 0.10 50);
+  --moyen-bg: oklch(97% 0.04 92); --moyen-brd: oklch(82% 0.13 92);
+  --info-bg: oklch(96% 0.04 250); --info-brd: oklch(80% 0.10 250);
+  --green-bg: oklch(96% 0.04 145); --green-brd: oklch(80% 0.10 145);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.6;
+  min-height: 100vh; display: flex;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w);
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 100; overflow: hidden;
+}
+.sb-logo {
+  padding: 18px 18px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.sb-logo-text {}
+.sb-logo-eye { font-family: var(--font-sans); font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--green); margin-bottom: 2px; }
+.sb-logo-name { font-size: 16px; font-weight: 700; font-family: var(--font-sans); }
+.print-btn {
+  flex-shrink: 0; padding: 6px 10px; border-radius: 7px; cursor: pointer;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim);
+  font-size: 11px; font-family: var(--font-sans); font-weight: 600;
+  display: flex; align-items: center; gap: 5px; transition: all 0.15s; white-space: nowrap;
+}
+.print-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--text-dim); }
+
+/* Méta machine */
+.sb-meta { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.sb-meta-row { display: flex; flex-direction: column; gap: 1px; }
+.sb-meta-label { font-family: var(--font-sans); font-size: 14px; color: var(--text); font-weight: 600; }
+.sb-meta-val   { font-family: var(--font-sans); font-size: 13px; font-weight: 400; color: var(--text-mid); }
+
+/* Informations système */
+.sb-sysinfo { padding: 10px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; }
+.sb-sysinfo-title { font-family: var(--font-sans); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+.sb-sysinfo-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.sb-sysinfo-key { font-size: 11px; color: var(--text-dim); font-family: var(--font-sans); white-space: nowrap; }
+.sb-sysinfo-val { font-size: 11px; color: var(--text-mid); font-family: var(--font-sans); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Processus suspects */
+.sb-procs-header {
+  padding: 8px 18px 6px; flex-shrink: 0;
+  font-family: var(--font-sans); font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sb-procs-empty { padding: 8px 18px; font-size: 11.5px; color: var(--green); font-family: var(--font-sans); border-bottom: 1px solid var(--border); font-weight: 500; }
+.proc-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 18px; border-bottom: 1px solid var(--border); cursor: default; }
+.proc-item:last-of-type { border-bottom: 1px solid var(--border); }
+.proc-sev-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.proc-sev-dot.critique { background: var(--critique); }
+.proc-sev-dot.eleve    { background: var(--eleve); }
+.proc-sev-dot.moyen    { background: var(--moyen); }
+.proc-body {}
+.proc-name { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text); }
+.proc-reason { font-size: 10.5px; color: var(--text-dim); font-family: var(--font-sans); line-height: 1.4; }
+
+/* Alertes détectées */
+.sb-todo-header {
+  padding: 8px 18px 6px; flex-shrink: 0;
+  font-family: var(--font-sans); font-size: 9px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.sb-todo-count { font-family: var(--font-sans); font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 8px; background: var(--surface2); color: var(--text-dim); }
+.sb-todo-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 0; }
+.sb-todo-list::-webkit-scrollbar { width: 4px; }
+.sb-todo-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.todo-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 18px; border-bottom: 1px solid var(--border); cursor: default; transition: background 0.12s; }
+.todo-item:last-child { border-bottom: none; }
+.todo-item:hover { background: var(--surface2); }
+.todo-sev-bar { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 14px; margin-top: 3px; }
+.todo-sev-bar.critique { background: var(--critique); }
+.todo-sev-bar.eleve    { background: var(--eleve); }
+.todo-sev-bar.moyen    { background: var(--moyen); }
+.todo-sev-bar.info     { background: var(--info); }
+.todo-text { font-size: 12.5px; color: var(--text-mid); line-height: 1.45; font-family: var(--font-sans); }
+
+/* ── LAYOUT ── */
+.main { margin-left: var(--sidebar-w); margin-right: var(--right-w); flex: 1; padding: 32px; min-width: 0; }
+.right-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: var(--right-w);
+  background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow-y: auto; z-index: 100;
+}
+.rp-section { padding: 14px 16px 12px; border-bottom: 1px solid var(--border); }
+.rp-section:last-child { border-bottom: none; }
+.rp-title { font-family: var(--font-sans); font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+
+/* ── HÉROS SCORE ── */
+.score-hero {
+  display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 36px 40px; margin-bottom: 28px;
+  position: relative; overflow: hidden;
+}
+.score-hero::before {
+  content: ''; position: absolute; top: -80px; right: -60px; width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, oklch(68% 0.17 145 / 0.07) 0%, transparent 70%); pointer-events: none;
+}
+.score-ring-wrap { position: relative; flex-shrink: 0; }
+.score-ring-wrap svg { display: block; transform: rotate(-90deg); }
+.score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-num { font-family: var(--font-mono); font-size: 52px; font-weight: 700; line-height: 1; }
+.score-denom { font-family: var(--font-sans); font-size: 14px; color: var(--text-dim); margin-top: 2px; }
+.score-right { display: flex; flex-direction: column; gap: 16px; }
+.score-title { font-size: 22px; font-weight: 700; font-family: var(--font-sans); }
+.score-sub { font-family: var(--font-sans); font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.sev-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+.sev-chip { display: flex; flex-direction: column; align-items: center; padding: 12px 20px; border-radius: 10px; border: 1px solid var(--border); min-width: 72px; transition: transform 0.15s; cursor: default; }
+.sev-chip:hover { transform: translateY(-2px); }
+.chip-n { font-family: var(--font-mono); font-size: 28px; font-weight: 700; line-height: 1; }
+.chip-l { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-top: 4px; font-weight: 600; font-family: var(--font-sans); }
+.chip-critique { background: var(--critique-bg); border-color: var(--critique-brd) !important; } .chip-critique .chip-n { color: var(--critique); }
+.chip-eleve    { background: var(--eleve-bg);    border-color: var(--eleve-brd) !important; }    .chip-eleve .chip-n    { color: var(--eleve); }
+.chip-moyen    { background: var(--moyen-bg);    border-color: var(--moyen-brd) !important; }    .chip-moyen .chip-n    { color: var(--moyen); }
+.chip-info     { background: var(--info-bg);     border-color: var(--info-brd) !important; }     .chip-info .chip-n     { color: var(--info); }
+
+/* ── TITRES DE SECTION ── */
+.section { margin-bottom: 32px; scroll-margin-top: 24px; }
+.section-title { font-family: var(--font-sans); margin-bottom: 14px; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); border-left-width: 4px; }
+.st-label { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; flex: 1; }
+.st-count { font-family: var(--font-mono); font-size: 22px; font-weight: 700; line-height: 1; }
+.section-title.st-critique { border-left-color: var(--critique); } .section-title.st-critique .st-label, .section-title.st-critique .st-count { color: var(--critique); }
+.section-title.st-eleve    { border-left-color: var(--eleve); }    .section-title.st-eleve .st-label,    .section-title.st-eleve .st-count    { color: var(--eleve); }
+.section-title.st-moyen    { border-left-color: var(--moyen); }    .section-title.st-moyen .st-label,    .section-title.st-moyen .st-count    { color: var(--moyen); }
+.section-title.st-info     { border-left-color: var(--info); }     .section-title.st-info .st-label,     .section-title.st-info .st-count     { color: var(--info); }
+.section-title.st-neutral  { border-left-color: var(--text-dim); } .section-title.st-neutral .st-label   { color: var(--text-mid); }
+
+/* ── CARTES D'ALERTES ── */
+.alert-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
+.alert-card:hover { border-color: var(--text-dim); }
+.alert-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; cursor: pointer; user-select: none; }
+.sev-bar { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 20px; }
+.sev-bar.critique { background: var(--critique); } .sev-bar.eleve { background: var(--eleve); } .sev-bar.moyen { background: var(--moyen); } .sev-bar.info { background: var(--info); }
+.alert-title-text { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.5; font-family: var(--font-sans); color: var(--text); }
+.alert-chevron { font-size: 10px; color: var(--text-dim); transition: transform 0.25s; flex-shrink: 0; margin-top: 3px; }
+.alert-chevron.open { transform: rotate(180deg); }
+.alert-body { padding: 0 18px 0 33px; overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.25s; }
+.alert-body.open { max-height: 440px; padding-bottom: 14px; }
+.alert-desc { font-size: 13px; color: var(--text-mid); line-height: 1.75; margin-bottom: 12px; font-family: var(--font-sans); }
+.alert-reco { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); border-radius: 6px; padding: 11px 13px; }
+.reco-label { font-family: var(--font-sans); font-size: 8.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
+.reco-text { font-size: 12.5px; color: var(--text-mid); line-height: 1.7; font-family: var(--font-sans); }
+code { font-family: var(--font-mono); font-size: 11.5px; background: var(--surface2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; color: var(--moyen); }
+
+/* ── TABLEAUX ── */
+.table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.data-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.data-table thead tr { border-bottom: 1px solid var(--border); }
+.data-table th { padding: 11px 13px; font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-dim); text-align: left; white-space: nowrap; }
+.data-table td { padding: 10px 13px; font-size: 13px; border-top: 1px solid var(--border); vertical-align: middle; overflow: hidden; }
+.data-table tbody tr:hover td { background: var(--surface2); }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+.abuse-chip { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 5px; }
+.abuse-ok   { background: var(--green-bg);    color: var(--green); }
+.abuse-warn { background: var(--eleve-bg);    color: var(--eleve); }
+.abuse-bad  { background: var(--critique-bg); color: var(--critique); }
+.proc-tag { font-family: var(--font-mono); font-size: 11px; background: var(--surface2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; color: var(--text-mid); display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-text { font-size: 12px; color: var(--text-dim); font-family: var(--font-sans); }
+.table-footnote { padding: 9px 13px; font-size: 11px; color: var(--text-dim); border-top: 1px solid var(--border); font-style: italic; font-family: var(--font-sans); }
+
+/* ── PANNEAU DROIT ── */
+.disk-item-sm { margin-bottom: 12px; } .disk-item-sm:last-child { margin-bottom: 0; }
+.disk-meta-sm { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+.disk-label-sm { font-size: 12px; font-weight: 600; font-family: var(--font-sans); }
+.disk-stat-sm { font-family: var(--font-sans); font-size: 11px; color: var(--text-dim); font-weight: 700; }
+.disk-bar { height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.disk-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+.fill-ok { background: var(--green); } .fill-warn { background: var(--moyen); } .fill-danger { background: var(--critique); }
+.health-drive { margin-bottom: 13px; padding-bottom: 13px; border-bottom: 1px solid var(--border); }
+.health-drive:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.health-drive-name { font-size: 11.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; font-family: var(--font-sans); line-height: 1.4; }
+.smart-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.smart-dot { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-sans); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px; border: 1px solid; }
+.smart-dot.has-tip { cursor: help; }
+.smart-ok      { background: var(--green-bg);    color: var(--green);    border-color: var(--green-brd); }
+.smart-warn    { background: var(--moyen-bg);    color: var(--moyen);    border-color: var(--moyen-brd); }
+.smart-crit    { background: var(--critique-bg); color: var(--critique); border-color: var(--critique-brd); }
+.smart-neutral { background: var(--surface2);    color: var(--text-mid); border-color: var(--border); }
+.smart-dot-icon { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.rp-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.rp-row:last-child { border-bottom: none; }
+.rp-row-label { font-size: 12px; color: var(--text-mid); font-family: var(--font-sans); }
+.rp-row-val { font-family: var(--font-sans); font-size: 11px; color: var(--text-dim); text-align: right; max-width: 55%; }
+.update-item-sm { padding: 7px 0; border-bottom: 1px solid var(--border); }
+.update-item-sm:last-of-type { border-bottom: none; }
+.update-name-sm { font-size: 12px; font-weight: 500; color: var(--text); font-family: var(--font-sans); }
+.update-meta-sm { font-family: var(--font-sans); font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+.no-critical { text-align: center; padding: 9px 0; font-size: 11.5px; color: var(--green); font-family: var(--font-sans); font-weight: 500; }
+.port-item { display: flex; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.port-item:last-child { border-bottom: none; }
+.port-badge { font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; flex-shrink: 0; background: var(--info-bg); color: var(--info); border: 1px solid var(--info-brd); white-space: nowrap; min-width: 44px; text-align: center; cursor: default; }
+.port-proc { font-family: var(--font-mono); font-size: 10px; color: var(--text-mid); flex: 1; }
+.port-note { font-size: 10px; color: var(--text-dim); font-family: var(--font-sans); font-style: italic; }
+
+/* ── INFOBULLE PORTAIL ── */
+.portal-tip {
+  position: fixed; z-index: 9999; pointer-events: none;
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--text-mid); font-size: 11px; font-family: var(--font-sans); font-weight: 400;
+  padding: 7px 11px; border-radius: 7px; line-height: 1.6;
+  max-width: 280px; white-space: pre-line;
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.4);
+}
+
+/* ── IMPRESSION PDF ── */
+@media print {
+  @page { margin: 14mm 12mm; }
+  .sidebar, .right-panel, .print-btn { display: none !important; }
+  .main { margin: 0 !important; padding: 0 !important; }
+  body { background: #fff !important; color: #111 !important; font-size: 12px; }
+  .score-hero, .alert-card, .table-card { break-inside: avoid; border: 1px solid #ddd !important; background: #fff !important; }
+  .alert-body { max-height: none !important; padding-bottom: 12px !important; }
+  .alert-chevron { display: none !important; }
+  .section-title { background: #f4f4f4 !important; border-color: #ccc !important; }
+  .data-table td, .data-table th { border-color: #ddd !important; }
+}
+
+@media (max-width: 1100px) { .right-panel { display: none; } .main { margin-right: 0; } }
+@media (max-width: 768px)  { .sidebar { display: none; } .main { margin-left: 0; padding: 20px; } .score-hero { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{ "theme": "dark" }/*EDITMODE-END*/;
+
+function scoreColor(s) {
+  if (s >= 90) return 'oklch(50% 0.18 145)';
+  if (s >= 70) return 'oklch(68% 0.17 145)';
+  if (s >= 50) return 'oklch(84% 0.19  92)';
+  if (s >= 30) return 'oklch(76% 0.18  50)';
+  return 'oklch(65% 0.22  25)';
+}
+function scoreLabel(s) {
+  if (s >= 90) return 'Excellent';
+  if (s >= 70) return 'Attention requise';
+  if (s >= 50) return 'Risque modéré';
+  if (s >= 30) return 'Risque élevé';
+  return 'Critique';
+}
+
+// ── INFOBULLE PORTAIL — jamais coupée ─────────────────────────────
+function Tip({ text, children, className, style }) {
+  const [pos, setPos] = useState(null);
+  const ref = useRef(null);
+  const show = () => {
+    if (!ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    setPos({ right: window.innerWidth - r.right, bottom: window.innerHeight - r.top + 8 });
+  };
+  return (
+    <>
+      <span ref={ref} className={className} style={style} onMouseEnter={show} onMouseLeave={() => setPos(null)}>
+        {children}
+      </span>
+      {pos && ReactDOM.createPortal(
+        <div className="portal-tip" style={{ right: pos.right, bottom: pos.bottom }}>{text}</div>,
+        document.body
+      )}
+    </>
+  );
+}
+
+const ALERTS = [
+{ id: 1, sev: "moyen", short: "Compte Lucas sans mot de passe requis",
+  title: <>Compte administrateur <code>Lucas</code> — PasswordRequired: false</>,
+  desc: <><code>Get-LocalUser</code> retourne <code>PasswordRequired = false</code> pour le compte <code>Lucas</code>, membre du groupe Administrateurs. Un accès physique ou une session RDP permet l'élévation sans authentification.</>,
+  reco: <>Activer l'obligation de mot de passe : <code>net user Lucas *</code> puis définir un mot de passe fort, ou via Paramètres → Comptes.</>
+},
+{ id: 2, sev: "moyen", short: "Certificat racine CN=PC-LUCAS — validité 1000 ans",
+  title: <>Certificat racine <code>CN=PC-LUCAS</code> — validité 1000 ans</>,
+  desc: <>Thumbprint : <code>1D902510AAF9994E727821D20F54AB2B7682819D</code><br />Valide du 2026-04-20 au 3025-08-21 (1000 ans), ajouté en <em>LocalMachine\Root</em>. Permet l'interception HTTPS (MITM). Origine probable : Hyper-V ou outil de débogage réseau.</>,
+  reco: <>Identifier l'outil ayant généré ce certificat. Si non nécessaire : <code>certlm.msc</code> → Autorités de certification racines de confiance → supprimer <code>PC-LUCAS</code>.</>
+},
+{ id: 3, sev: "moyen", short: "Service orphelin LogiSyncStub au démarrage",
+  title: <>Service orphelin <code>LogiSyncStub</code> — Event ID 7000</>,
+  desc: <>Service configuré en démarrage <strong>Automatique</strong>, mais le fichier <code>C:\Program Files (x86)\Logitech\LogiSyncStub\LogiSyncStub.exe</code> est absent. Événement ID 7000 confirmé le 2026-04-21 à 00:23.</>,
+  reco: <>Supprimer le service orphelin : <code>sc delete LogiSyncStub</code>, ou réinstaller Logitech G Hub / Options+.</>
+},
+{ id: 4, sev: "moyen", short: "Hotspot Shield — crash driver réseau kernel-level",
+  title: <>Hotspot Shield VPN — crash <code>cmw_srv.exe</code> répété</>,
+  desc: <>Exception .NET <code>0xe0434352</code> via KERNELBASE.dll (Event ID 1000, 2026-04-21 00:22). VPN commercial avec driver réseau kernel-level — surface d'attaque élevée et télémétrie commerciale.</>,
+  reco: <>Désinstaller Hotspot Shield si non utilisé activement. Sinon, mettre à jour vers la dernière version.</>
+},
+{ id: 5, sev: "moyen", short: "Riot Vanguard — 20+ crashes kernel en 7 jours",
+  title: <>Riot Vanguard <code>vgm.exe</code> — 20+ crashes kernel en 7 jours</>,
+  desc: <>Exception <code>0xc0000409</code> (Stack Buffer Overrun) répété 20+ fois. Antitriche opérant en mode kernel (ring 0) — une instabilité persistante peut provoquer des BSOD ou compromettre l'intégrité du système.</>,
+  reco: <>Désinstaller et réinstaller Riot Vanguard. Si les crashs persistent, signaler à Riot Support et envisager de désactiver l'antitriche hors des sessions de jeu.</>
+},
+{ id: 6, sev: "info", short: "LG Monitor App Installer au démarrage",
+  title: <>LG Monitor App Installer au démarrage</>,
+  desc: <><code>LG Monitor App Installer.lnk</code> présent dans <code>%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup</code>. Installeur relancé à chaque session — inutile si l'application est déjà installée.</>,
+  reco: <>Supprimer le raccourci via le Gestionnaire des tâches → Onglet Démarrage, ou manuellement dans le dossier Startup.</>
+},
+{ id: 7, sev: "info", short: "Disque H: à 82% de capacité",
+  title: <>Disque H: à 82% de capacité</>,
+  desc: <>H: — 763,7 GB utilisés / 931,5 GB total → <strong>167,8 GB libres</strong>. Seuil d'alerte à 80%.</>,
+  reco: <>Archiver ou supprimer les fichiers volumineux non utilisés. Surveiller l'évolution.</>
+},
+{ id: 8, sev: "info", short: "Erreurs ACPI RTC à chaque démarrage",
+  title: <>Erreurs ACPI RTC à chaque démarrage — Event ID 21</>,
+  desc: <>3 occurrences à chaque boot — l'horloge matérielle RTC ne peut pas être définie via ACPI. Code <code>0xC0000001</code>. Bénin dans la plupart des cas, mais peut indiquer un firmware BIOS à mettre à jour.</>,
+  reco: <>Vérifier les paramètres d'heure dans le BIOS/UEFI. Mettre à jour le firmware si une version récente est disponible.</>
+}];
+
+
+const NETWORK = [
+{ ip: "160.79.104.10", abuse: 37, isp: "Anthropic", country: "🇺🇸", proc: "claude.exe",
+  note: "Faux positif — IP Anthropic partagée, listée par des scanners automatisés sans activité malveillante réelle" },
+{ ip: "34.149.66.137", abuse: 19, isp: "Google LLC", country: "🇺🇸", proc: "claude.exe",
+  note: "Faux positif — CDN Google Cloud utilisé par l'API Claude Code pour les requêtes LLM" },
+{ ip: "3.74.145.219", abuse: 0, isp: "AWS", country: "🇩🇪", proc: "LeagueClient",
+  note: "Serveur Riot Games hébergé sur AWS Frankfurt — connexion normale en session League of Legends" },
+{ ip: "172.64.147.231", abuse: 0, isp: "Cloudflare", country: "🇺🇸", proc: "LeagueClient / Riot",
+  note: "CDN Cloudflare pour Riot Games — distribution d'assets et patches League of Legends" },
+{ ip: "96.17.207.142", abuse: 2, isp: "Akamai", country: "🇫🇷", proc: "RiotClientServices",
+  note: "CDN Akamai Riot — vérification de licence et téléchargement client avant lancement du jeu" },
+{ ip: "172.65.252.238", abuse: 0, isp: "Cloudflare", country: "🇺🇸", proc: "RiotClientServices",
+  note: "CDN Cloudflare Riot — télémétrie et distribution des mises à jour du client Riot" },
+{ ip: "104.18.157.37", abuse: 0, isp: "Cloudflare", country: "🇺🇸", proc: "RiotClientServices",
+  note: "CDN Cloudflare Riot — authentification et synchronisation du compte joueur" },
+{ ip: "4.208.165.242", abuse: 0, isp: "Microsoft", country: "🇮🇪", proc: "MsMpEng",
+  note: "Microsoft Azure — envoi de télémétrie Defender et téléchargement de signatures antivirus" },
+{ ip: "92.122.166.120", abuse: 0, isp: "Akamai", country: "🇫🇷", proc: "msedgewebview2",
+  note: "CDN Akamai — mise à jour automatique du composant WebView2 intégré à Edge" },
+{ ip: "155.133.248.43", abuse: 0, isp: "Valve", country: "🇳🇱", proc: "steam.exe",
+  note: "Serveur Steam — synchronisation du catalogue, cloud saves et mise à jour de Steam" },
+{ ip: "74.178.130.41", abuse: 0, isp: "Microsoft", country: "🇳🇱", proc: "msedge",
+  note: "Microsoft — télémétrie Edge, vérification de révocation de certificats et SmartScreen" },
+{ ip: "162.159.61.3", abuse: 0, isp: "Cloudflare", country: "🇺🇸", proc: "msedgewebview2",
+  note: "Cloudflare — services DNS et réseau utilisés par le composant WebView2 dans Edge" }];
+
+
+const PORTS = [
+{ port: 5000, proc: "python.exe",      note: "Flask local (dwnldr)" },
+{ port: 2999, proc: "LeagueOfLegends", note: "API locale League" },
+{ port: 445,  proc: "System",          note: "SMB — réseau privé" },
+{ port: 139,  proc: "System",          note: "NetBIOS — réseau privé" },
+{ port: 2179, proc: "vmms.exe",        note: "Hyper-V VM Connect" }];
+
+
+const DISKS = [
+{ label: "C: (Windows)", pct: 52, used: "485,2 GB", total: "930,6 GB" },
+{ label: "H: (HDD)", pct: 82, used: "763,7 GB", total: "931,5 GB" },
+{ label: "S: (Kingston)", pct: 75, used: "349,5 GB", total: "465,8 GB" }];
+
+
+const DRIVES_HEALTH = [
+{ name: "Samsung SSD 970 EVO Plus 500GB", reallocated: 0, pending: 0, uncorrectable: 0, temp: 38, status: "ok" },
+{ name: "KINGSTON SFYRS1000G (SSD 932GB)", reallocated: 0, pending: 0, uncorrectable: 0, temp: 32, status: "ok" },
+{ name: "ST1000DX001 HDD 932GB", reallocated: 0, pending: 0, uncorrectable: 0, temp: 41, status: "ok" }];
+
+
+const PROCS_SUSPECTS = [];
+
+
+// ── ANNEAU PRINCIPAL ──────────────────────────────────────────────
+const ScoreRing = React.memo(function ScoreRing({ score }) {
+  const SIZE = 170, r = 72, sw = 10, cx = 85, cy = 85;
+  const circ = 2 * Math.PI * r;
+  const target = circ - circ * score / 100;
+  const color = scoreColor(score);
+  const arcRef = useRef(null), numRef = useRef(null);
+  useEffect(() => {
+    const arc = arcRef.current, num = numRef.current;
+    if (!arc || !num) return;
+    arc.style.transition = 'none'; arc.style.stroke = color;
+    arc.style.strokeDasharray = circ; arc.style.strokeDashoffset = circ;
+    num.textContent = '0'; num.style.color = color;
+    const t1 = setTimeout(() => {
+      arc.style.transition = `stroke-dashoffset 1600ms cubic-bezier(0.4,0,0.2,1)`;
+      arc.style.strokeDashoffset = target;
+      arc.addEventListener('transitionend', () => { num.textContent = score; }, { once: true });
+    }, 50);
+    const t2 = setTimeout(() => { num.textContent = score; }, 1900);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+  return (
+    <div className="score-ring-wrap" style={{ width: SIZE, height: SIZE }}>
+      <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--surface2)" strokeWidth={sw} />
+        <circle ref={arcRef} cx={cx} cy={cy} r={r} fill="none" strokeWidth={sw} strokeLinecap="round"
+          style={{ strokeDasharray: circ, strokeDashoffset: circ, stroke: color }} />
+      </svg>
+      <div className="score-center">
+        <div className="score-num" ref={numRef} style={{ color }}>0</div>
+        <div className="score-denom">/100</div>
+      </div>
+    </div>);
+});
+
+// ── CARTE D'ALERTE ────────────────────────────────────────────────
+function AlertCard({ alert }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="alert-card">
+      <div className="alert-header" onClick={() => setOpen(o => !o)}>
+        <div className={`sev-bar ${alert.sev}`} />
+        <div className="alert-title-text">{alert.title}</div>
+        <div className={`alert-chevron${open ? ' open' : ''}`}>▼</div>
+      </div>
+      <div className={`alert-body${open ? ' open' : ''}`}>
+        <div className="alert-desc">{alert.desc}</div>
+        <div className="alert-reco">
+          <div className="reco-label">Recommandation</div>
+          <div className="reco-text">{alert.reco}</div>
+        </div>
+      </div>
+    </div>);
+}
+
+function AbuseChip({ score }) {
+  const cls = score >= 30 ? 'abuse-bad' : score >= 10 ? 'abuse-warn' : 'abuse-ok';
+  return <span className={`abuse-chip ${cls}`}>{score}</span>;
+}
+
+function DiskBar({ label, pct }) {
+  const cls = pct >= 85 ? 'fill-danger' : pct >= 75 ? 'fill-warn' : 'fill-ok';
+  const [w, setW] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setW(pct), 400); return () => clearTimeout(t); }, []);
+  return (
+    <div className="disk-item-sm">
+      <div className="disk-meta-sm">
+        <span className="disk-label-sm">{label}</span>
+        <span className="disk-stat-sm">{pct}%</span>
+      </div>
+      <div className="disk-bar"><div className={`disk-fill ${cls}`} style={{ width: `${w}%` }} /></div>
+    </div>);
+}
+
+const SMART_TIPS = {
+  reallocated:   "Secteurs réalloués (SMART 5)\nSecteurs physiquement défectueux remplacés par\ndes blocs de réserve. 0 = normal.\nToute valeur > 0 indique une dégradation physique.",
+  pending:       "Secteurs instables (SMART 197)\nSecteurs en attente de relecture — potentiellement\nillisibles. Peut causer des pertes de données\nsilencieuses sans avertissement.",
+  uncorrectable: "Erreurs non corrigibles (SMART 198)\nLectures ayant échoué même après correction ECC.\nSigne sérieux : risque de panne imminente.\nSauvegarder immédiatement si > 0.",
+};
+
+function tempStyle(t) {
+  const pct = Math.max(0, Math.min(1, (t - 28) / 32));
+  if (pct < 0.5) {
+    const p = pct / 0.5;
+    return { background: `oklch(${17 + p*2}% ${0.06} ${145 - p*63})`, color: `oklch(${68 - p*12}% 0.17 ${145 - p*63})`, borderColor: `oklch(${28 - p*2}% 0.10 ${145 - p*54})` };
+  }
+  const p = (pct - 0.5) / 0.5;
+  return { background: `oklch(${19 - p*3}% 0.07 ${82 - p*57})`, color: `oklch(${56 + p*9}% ${0.18 + p*0.04} ${82 - p*57})`, borderColor: `oklch(26% ${0.09} ${82 - p*57})` };
+}
+
+function SmartDot({ field, value }) {
+  if (field === 'temp') {
+    return (
+      <span className="smart-dot" style={tempStyle(value)}>
+        <span className="smart-dot-icon" />Temp: {value}°C
+      </span>);
+  }
+  const cls = value === 0 ? 'smart-ok' : value <= 5 ? 'smart-warn' : 'smart-crit';
+  const labels = { reallocated: 'Réalloués', pending: 'Pending', uncorrectable: 'Non corr.' };
+  return (
+    <Tip text={SMART_TIPS[field]} className={`smart-dot has-tip ${cls}`}>
+      <span className="smart-dot-icon" />{labels[field]}: {value}
+    </Tip>);
+}
+
+// ── PANNEAU DROIT ─────────────────────────────────────────────────
+function RightPanel() {
+  return (
+    <div className="right-panel">
+      <div className="rp-section">
+        <div className="rp-title">Santé des disques — SMART</div>
+        <div style={{ marginBottom: 14 }}>
+          {DRIVES_HEALTH.map(d =>
+            <div key={d.name} className="health-drive">
+              <div className="health-drive-name">{d.name}</div>
+              <div className="smart-row">
+                <SmartDot field="reallocated"  value={d.reallocated} />
+                <SmartDot field="pending"       value={d.pending} />
+                <SmartDot field="uncorrectable" value={d.uncorrectable} />
+                <SmartDot field="temp"          value={d.temp} />
+              </div>
+            </div>
+          )}
+        </div>
+        {DISKS.map(d => <DiskBar key={d.label} {...d} />)}
+      </div>
+
+      <div className="rp-section">
+        <div className="rp-title">Mises à jour</div>
+        <div className="update-item-sm">
+          <div className="update-name-sm">Defender Antivirus</div>
+          <div className="update-meta-sm">v1.449.232.0 · 1521,4 MB</div>
+        </div>
+        <div className="no-critical">✓ Aucune mise à jour critique</div>
+      </div>
+
+      <div className="rp-section">
+        <div className="rp-title">Ports en écoute</div>
+        {PORTS.map(p =>
+          <div key={p.port} className="port-item">
+            <span className="port-badge">{p.port}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="port-proc">{p.proc}</div>
+              {p.note ? <div className="port-note">{p.note}</div> : null}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>);
+}
+
+// ── APP ──────────────────────────────────────────────────────────
+function App() {
+  const SCORE = 72;
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  useEffect(() => {
+    document.documentElement.removeAttribute('data-light');
+    if (tweaks.theme === 'light') document.documentElement.setAttribute('data-light', '');
+  }, [tweaks.theme]);
+  useEffect(() => { try { localStorage.setItem('shc-tweaks', JSON.stringify(tweaks)); } catch (e) {} }, [tweaks]);
+  useEffect(() => {
+    try { const s = localStorage.getItem('shc-tweaks'); if (s) setTweaks(p => ({ ...p, ...JSON.parse(s) })); } catch (e) {}
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+  }, []);
+
+  const color = scoreColor(SCORE);
+  const SEV_ORDER = { critique: 0, eleve: 1, moyen: 2, info: 3 };
+  const nCritique = ALERTS.filter(a => a.sev === 'critique').length;
+  const nEleve    = ALERTS.filter(a => a.sev === 'eleve').length;
+  const nMoyen    = ALERTS.filter(a => a.sev === 'moyen').length;
+  const nInfo     = ALERTS.filter(a => a.sev === 'info').length;
+  const TODO = [...ALERTS].sort((a, b) => SEV_ORDER[a.sev] - SEV_ORDER[b.sev]);
+  const sevGroups = [
+    { key: 'critique', label: 'Critique', count: nCritique, cls: 'st-critique' },
+    { key: 'eleve',    label: 'Élevé',    count: nEleve,    cls: 'st-eleve' },
+    { key: 'moyen',    label: 'Moyen',    count: nMoyen,    cls: 'st-moyen' },
+    { key: 'info',     label: 'Info',     count: nInfo,     cls: 'st-info' },
+  ].filter(g => g.count > 0);
+
+  const sysinfo = [
+    ['OS',          'Windows 11 Pro'],
+    ['Build',       '10.0.26200'],
+    ['Machine',     'PC-LUCAS'],
+    ['Analyse',     '2026-04-21 22:10'],
+    ['Connexions',  '12 actives'],
+    ['Processus',   'claude, League, Riot, Edge, Steam'],
+  ];
+
+  return (
+    <>
+      {/* BARRE LATÉRALE GAUCHE */}
+      <nav className="sidebar">
+        <div className="sb-logo">
+          <div className="sb-logo-text">
+            <div className="sb-logo-eye">Rapport de sécurité</div>
+            <div className="sb-logo-name">Healthcheck</div>
+          </div>
+          <button className="print-btn" onClick={() => window.print()}>⬇ PDF</button>
+        </div>
+
+        <div className="sb-meta">
+          {[['Machine', 'PC-LUCAS'], ['OS', 'Windows 11 Pro 10.0.26200'], ["Date d'analyse", '2026-04-21 · 22:10']].map(([k, v]) =>
+            <div key={k} className="sb-meta-row">
+              <span className="sb-meta-label">{k}</span>
+              <span className="sb-meta-val">{v}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="sb-sysinfo">
+          <div className="sb-sysinfo-title">Informations système</div>
+          {sysinfo.map(([k, v]) =>
+            <div key={k} className="sb-sysinfo-row">
+              <span className="sb-sysinfo-key">{k}</span>
+              <span className="sb-sysinfo-val">{v}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="sb-procs-header">
+          <span>Processus suspects</span>
+          <span className="sb-todo-count">{PROCS_SUSPECTS.length}</span>
+        </div>
+        {PROCS_SUSPECTS.length === 0
+          ? <div className="sb-procs-empty">✓ Aucun processus suspect</div>
+          : PROCS_SUSPECTS.map((p, i) =>
+              <div key={i} className="proc-item">
+                <div className={`proc-sev-dot ${p.sev}`} />
+                <div className="proc-body">
+                  <div className="proc-name">{p.name}</div>
+                  <div className="proc-reason">{p.reason}</div>
+                </div>
+              </div>
+            )
+        }
+
+        <div className="sb-todo-header">
+          <span>Alertes détectées</span>
+          <span className="sb-todo-count">{ALERTS.length}</span>
+        </div>
+        <div className="sb-todo-list">
+          {TODO.map(a =>
+            <div key={a.id} className="todo-item">
+              <div className={`todo-sev-bar ${a.sev}`} />
+              <span className="todo-text">{a.short}</span>
+            </div>
+          )}
+        </div>
+      </nav>
+
+      {/* PANNEAU CENTRAL */}
+      <main className="main">
+        <div className="score-hero">
+          <ScoreRing score={SCORE} />
+          <div className="score-right">
+            <div>
+              <div className="score-title" style={{ color }}>{scoreLabel(SCORE)}</div>
+              <div className="score-sub">SCORE DE SÉCURITÉ — PC-LUCAS</div>
+            </div>
+            <div className="sev-chips">
+              <div className="sev-chip chip-critique"><div className="chip-n">{nCritique}</div><div className="chip-l">Critique</div></div>
+              <div className="sev-chip chip-eleve">   <div className="chip-n">{nEleve}</div><div className="chip-l">Élevé</div></div>
+              <div className="sev-chip chip-moyen">   <div className="chip-n">{nMoyen}</div><div className="chip-l">Moyen</div></div>
+              <div className="sev-chip chip-info">    <div className="chip-n">{nInfo}</div><div className="chip-l">Info</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="section" id="anomalies">
+          {sevGroups.map((g, i) =>
+            <div key={g.key}>
+              <div className={`section-title ${g.cls}`} style={{ marginTop: i > 0 ? 22 : 0 }}>
+                <span className="st-label">{g.label}</span>
+                <span className="st-count">{g.count}</span>
+              </div>
+              {ALERTS.filter(a => a.sev === g.key).map(a => <AlertCard key={a.id} alert={a} />)}
+            </div>
+          )}
+        </div>
+
+        <div className="section" id="network">
+          <div className="section-title st-neutral">
+            <span className="st-label">Connexions sortantes — AbuseIPDB</span>
+          </div>
+          <div className="table-card">
+            <table className="data-table">
+              <colgroup>
+                <col style={{width:'140px'}} /><col style={{width:'100px'}} />
+                <col style={{width:'44px'}} /><col style={{width:'148px'}} /><col />
+              </colgroup>
+              <thead><tr><th>IP</th><th>ISP</th><th>Pays</th><th>Processus</th><th>Note</th></tr></thead>
+              <tbody>
+                {NETWORK.map((r, i) =>
+                  <tr key={i}>
+                    <td className="mono">{r.ip}</td>
+                    
+                    <td style={{ color: 'var(--text-mid)', fontSize: '12px' }}>{r.isp}</td>
+                    <td style={{ fontSize: '14px' }}>{r.country}</td>
+                    <td><span className="proc-tag">{r.proc}</span></td>
+                    <td><span className="note-text">{r.note}</span></td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            
+          </div>
+        </div>
+      </main>
+
+      <RightPanel />
+    </>);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

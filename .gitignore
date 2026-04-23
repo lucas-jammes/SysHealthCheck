@@ -1,8 +1,11 @@
-# Clé API / secrets
+# Build artifacts
+dist/
+template_b64.txt
+
+# Secrets
 abuseipdb.key
+
+# Personal / infra scripts
 run_healthcheck.ps1
 run_healthcheck.bat
 prompt.md
-
-# Fichier intermédiaire
-template_b64.txt
