@@ -397,9 +397,9 @@ $html = $html -replace '(?s)const PROCS_SUSPECTS = \[.*?\];',     "const PROCS_S
 $html = $html -replace "(?s)const sysinfo = \[.*?\];",            "const sysinfo = [`n    $sysinfoContent`n  ];"
 
 # ── Écriture ──────────────────────────────────────────────────────────────────
-$desktop = [Environment]::GetFolderPath('Desktop')
+$outDir  = Split-Path $MyInvocation.MyCommand.Path
 $outFile = "rapport_securite_$(Get-Date -Format 'yyyy-MM-dd_HHmm').html"
-$outPath = Join-Path $desktop $outFile
+$outPath = Join-Path $outDir $outFile
 $utf8bom = New-Object System.Text.UTF8Encoding $true
 [System.IO.File]::WriteAllText($outPath, $html, $utf8bom)
 
