@@ -1,0 +1,7 @@
+# Clé API / secrets
+run_healthcheck.ps1
+run_healthcheck.bat
+prompt.md
+
+# Fichier intermédiaire
+template_b64.txt
