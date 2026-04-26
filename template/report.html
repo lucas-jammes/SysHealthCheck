@@ -6,9 +6,9 @@
 <title>Security Healthcheck — PC-LUCAS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -164,7 +164,8 @@ body {
 
 /* ── TITRES DE SECTION ── */
 .section { margin-bottom: 32px; scroll-margin-top: 24px; }
-.section-title { font-family: var(--font-sans); margin-bottom: 14px; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); border-left-width: 4px; }
+.section-title { font-family: var(--font-sans); margin-bottom: 14px; display: flex; align-items: center; gap: 14px; padding: 12px 18px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); border-left-width: 4px; cursor: pointer; user-select: none; transition: opacity 0.15s; }
+.section-title:hover { opacity: 0.85; }
 .st-label { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; flex: 1; }
 .st-count { font-family: var(--font-mono); font-size: 22px; font-weight: 700; line-height: 1; }
 .section-title.st-critique { border-left-color: var(--critique); } .section-title.st-critique .st-label, .section-title.st-critique .st-count { color: var(--critique); }
@@ -180,15 +181,39 @@ body {
 .sev-bar { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 20px; }
 .sev-bar.critique { background: var(--critique); } .sev-bar.eleve { background: var(--eleve); } .sev-bar.moyen { background: var(--moyen); } .sev-bar.info { background: var(--info); }
 .alert-title-text { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.5; font-family: var(--font-sans); color: var(--text); }
+.confidence-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-sans); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; margin-top: 3px; border: 1px solid; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.conf-high   { background: var(--critique-bg); color: var(--critique); border-color: var(--critique-brd); }
+.conf-medium { background: var(--moyen-bg);    color: var(--moyen);    border-color: var(--moyen-brd); }
+.conf-low    { background: var(--surface2);    color: var(--text-dim); border-color: var(--border); }
 .alert-chevron { font-size: 10px; color: var(--text-dim); transition: transform 0.25s; flex-shrink: 0; margin-top: 3px; }
 .alert-chevron.open { transform: rotate(180deg); }
-.alert-body { padding: 0 18px 0 33px; overflow: hidden; max-height: 0; transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.25s; }
-.alert-body.open { max-height: 440px; padding-bottom: 14px; }
+.alert-body { padding: 0 18px 0 33px; overflow: hidden; max-height: 0; transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.25s; }
+.alert-body.open { max-height: 900px; padding-bottom: 14px; }
 .alert-desc { font-size: 13px; color: var(--text-mid); line-height: 1.75; margin-bottom: 12px; font-family: var(--font-sans); }
-.alert-reco { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--text-dim); border-radius: 6px; padding: 11px 13px; }
-.reco-label { font-family: var(--font-sans); font-size: 8.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px; }
+.alert-reco { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 6px; padding: 11px 13px; }
+.reco-label { font-family: var(--font-sans); font-size: 8.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--green); opacity: 0.8; margin-bottom: 5px; }
 .reco-text { font-size: 12.5px; color: var(--text-mid); line-height: 1.7; font-family: var(--font-sans); }
 code { font-family: var(--font-mono); font-size: 11.5px; background: var(--surface2); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; color: var(--moyen); }
+/* Steps de correction */
+.steps-ol { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.step-item { display: flex; gap: 10px; align-items: flex-start; }
+.step-num  { flex-shrink: 0; width: 19px; height: 19px; border-radius: 50%; background: var(--surface3); border: 1px solid var(--border); color: var(--text-dim); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); margin-top: 1px; }
+.step-body { font-size: 12.5px; color: var(--text-mid); line-height: 1.6; font-family: var(--font-sans); flex: 1; }
+.step-cmd  { display: block; font-family: var(--font-mono); font-size: 11px; background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 5px; color: var(--moyen); margin-top: 5px; white-space: pre-wrap; word-break: break-all; cursor: text; }
+/* Alert highlighted depuis sidebar */
+.alert-card.highlighted { border-color: var(--info) !important; box-shadow: 0 0 0 2px var(--info-brd); }
+@keyframes highlight-in { 0%,100% { border-color: var(--border); } 40% { border-color: var(--info); box-shadow: 0 0 0 3px var(--info-brd); } }
+.alert-card.highlighted { animation: highlight-in 1.2s ease; }
+/* Todo-item actif */
+.todo-item.active { background: var(--surface2); }
+.todo-item.active .todo-text { color: var(--text); }
+/* Risk badge tableau */
+.risk-badge { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 5px; white-space: nowrap; }
+.risk-clean  { background: var(--green-bg);    color: var(--green);    border: 1px solid var(--green-brd); }
+.risk-low    { background: var(--info-bg);     color: var(--info);     border: 1px solid var(--info-brd); }
+.risk-medium { background: var(--moyen-bg);    color: var(--moyen);    border: 1px solid var(--moyen-brd); }
+.risk-high   { background: var(--eleve-bg);    color: var(--eleve);    border: 1px solid var(--eleve-brd); }
+.risk-crit   { background: var(--critique-bg); color: var(--critique); border: 1px solid var(--critique-brd); }
 
 /* ── TABLEAUX ── */
 .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -246,9 +271,11 @@ code { font-family: var(--font-mono); font-size: 11.5px; background: var(--surfa
   background: var(--surface3); border: 1px solid var(--border);
   color: var(--text-mid); font-size: 11px; font-family: var(--font-sans); font-weight: 400;
   padding: 7px 11px; border-radius: 7px; line-height: 1.6;
-  max-width: 280px; white-space: pre-line;
+  max-width: 290px; white-space: pre-line;
   box-shadow: 0 4px 16px oklch(0% 0 0 / 0.4);
+  animation: tip-in 0.1s ease;
 }
+@keyframes tip-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 /* ── IMPRESSION PDF ── */
 @media print {
@@ -267,8 +294,39 @@ code { font-family: var(--font-mono); font-size: 11.5px; background: var(--surfa
 </head>
 <body>
 <div id="root"></div>
+<div id="err-root" style="display:none;position:fixed;inset:0;background:#0a0a12;color:#f87171;font-family:monospace;font-size:13px;padding:40px;white-space:pre-wrap;z-index:9999;overflow:auto"></div>
+<script>
+window.addEventListener('error', function(e) {
+  var d = document.getElementById('err-root');
+  d.style.display = 'block';
+  d.textContent = (d.textContent || '') + '\n[JS] ' + (e.message || '') + '\n  at ' + (e.filename || '') + ':' + e.lineno + ':' + e.colno + (e.error && e.error.stack ? '\n' + e.error.stack : '');
+});
+setTimeout(function() {
+  if (!document.getElementById('root').firstChild) {
+    var d = document.getElementById('err-root');
+    d.style.display = 'block';
+    d.textContent += (window.React ? '' : '[ERREUR] React non chargé depuis le CDN — vérifier la connexion internet.\n')
+                   + (window.Babel ? '' : '[ERREUR] Babel non chargé depuis le CDN — vérifier la connexion internet.\n')
+                   + (d.textContent ? '' : '[ERREUR] React a échoué silencieusement. Ouvrir les DevTools (F12) → Console pour le détail.\n');
+  }
+}, 5000);
+</script>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
+
+class ErrorBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(e) { return { err: e }; }
+  componentDidCatch(e, info) {
+    var d = document.getElementById('err-root');
+    d.style.display = 'block';
+    d.textContent = '[ERROR BOUNDARY]\n' + (e && e.stack ? e.stack : String(e)) + '\n\nComponent stack:\n' + (info && info.componentStack);
+  }
+  render() {
+    if (this.state.err) return null;
+    return this.props.children;
+  }
+}
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{ "theme": "dark" }/*EDITMODE-END*/;
 
 function scoreColor(s) {
@@ -290,10 +348,20 @@ function scoreLabel(s) {
 function Tip({ text, children, className, style }) {
   const [pos, setPos] = useState(null);
   const ref = useRef(null);
+  const tipRef = useRef(null);
   const show = () => {
     if (!ref.current) return;
     const r = ref.current.getBoundingClientRect();
-    setPos({ right: window.innerWidth - r.right, bottom: window.innerHeight - r.top + 8 });
+    const TW = 290, TH = 80;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    // Placer au-dessus à gauche de l'élément par défaut
+    let left = Math.max(8, r.left);
+    let top  = r.top - TH - 8;
+    // Si ça sort à droite → aligner bord droit
+    if (left + TW > vw - 8) left = Math.max(8, vw - TW - 8);
+    // Si ça sort en haut → placer en dessous
+    if (top < 8) top = r.bottom + 8;
+    setPos({ left, top });
   };
   return (
     <>
@@ -301,7 +369,7 @@ function Tip({ text, children, className, style }) {
         {children}
       </span>
       {pos && ReactDOM.createPortal(
-        <div className="portal-tip" style={{ right: pos.right, bottom: pos.bottom }}>{text}</div>,
+        <div ref={tipRef} className="portal-tip" style={{ left: pos.left, top: pos.top }}>{text}</div>,
         document.body
       )}
     </>
@@ -309,45 +377,90 @@ function Tip({ text, children, className, style }) {
 }
 
 const ALERTS = [
-{ id: 1, sev: "moyen", short: "Compte Lucas sans mot de passe requis",
+{ id: 1, sev: "moyen", confidence: 90, short: "Compte Lucas sans mot de passe requis",
   title: <>Compte administrateur <code>Lucas</code> — PasswordRequired: false</>,
   desc: <><code>Get-LocalUser</code> retourne <code>PasswordRequired = false</code> pour le compte <code>Lucas</code>, membre du groupe Administrateurs. Un accès physique ou une session RDP permet l'élévation sans authentification.</>,
-  reco: <>Activer l'obligation de mot de passe : <code>net user Lucas *</code> puis définir un mot de passe fort, ou via Paramètres → Comptes.</>
+  reco: <>Activer l'obligation de mot de passe via PowerShell (admin).</>,
+  steps: [
+    {text: "Ouvrir PowerShell en tant qu'administrateur (clic droit → Exécuter en tant qu'administrateur)"},
+    {text: "Définir un nouveau mot de passe fort pour le compte", cmd: "net user Lucas *"},
+    {text: "Vérifier que le mot de passe est bien requis", cmd: "Get-LocalUser Lucas | Select Name, PasswordRequired"},
+  ]
 },
-{ id: 2, sev: "moyen", short: "Certificat racine CN=PC-LUCAS — validité 1000 ans",
+{ id: 2, sev: "moyen", confidence: 75, short: "Certificat racine CN=PC-LUCAS — validité 1000 ans",
   title: <>Certificat racine <code>CN=PC-LUCAS</code> — validité 1000 ans</>,
   desc: <>Thumbprint : <code>1D902510AAF9994E727821D20F54AB2B7682819D</code><br />Valide du 2026-04-20 au 3025-08-21 (1000 ans), ajouté en <em>LocalMachine\Root</em>. Permet l'interception HTTPS (MITM). Origine probable : Hyper-V ou outil de débogage réseau.</>,
-  reco: <>Identifier l'outil ayant généré ce certificat. Si non nécessaire : <code>certlm.msc</code> → Autorités de certification racines de confiance → supprimer <code>PC-LUCAS</code>.</>
+  reco: <>Identifier l'outil ayant généré ce certificat, puis le supprimer si non nécessaire.</>,
+  steps: [
+    {text: "Identifier l'origine du certificat", cmd: 'Get-ChildItem Cert:\\LocalMachine\\Root | Where-Object { $_.Subject -match "PC-LUCAS" } | Select Subject, Issuer, NotAfter, Thumbprint'},
+    {text: "Ouvrir le gestionnaire de certificats machine", cmd: "certlm.msc"},
+    {text: "Naviguer vers : Autorités de certification racines de confiance → Certificats → clic droit sur PC-LUCAS → Supprimer"},
+    {text: "Si lié à Hyper-V : ce certificat peut être recréé automatiquement — vérifier les paramètres Hyper-V dans Gestionnaire Hyper-V"},
+  ]
 },
-{ id: 3, sev: "moyen", short: "Service orphelin LogiSyncStub au démarrage",
+{ id: 3, sev: "moyen", confidence: 95, short: "Service orphelin LogiSyncStub au démarrage",
   title: <>Service orphelin <code>LogiSyncStub</code> — Event ID 7000</>,
   desc: <>Service configuré en démarrage <strong>Automatique</strong>, mais le fichier <code>C:\Program Files (x86)\Logitech\LogiSyncStub\LogiSyncStub.exe</code> est absent. Événement ID 7000 confirmé le 2026-04-21 à 00:23.</>,
-  reco: <>Supprimer le service orphelin : <code>sc delete LogiSyncStub</code>, ou réinstaller Logitech G Hub / Options+.</>
+  reco: <>Supprimer le service orphelin via PowerShell (admin).</>,
+  steps: [
+    {text: "Vérifier l'état du service", cmd: "Get-Service LogiSyncStub | Select Status, StartType, DisplayName"},
+    {text: "Arrêter le service si en cours", cmd: "Stop-Service LogiSyncStub -Force -ErrorAction SilentlyContinue"},
+    {text: "Supprimer le service orphelin", cmd: "sc.exe delete LogiSyncStub"},
+    {text: "Confirmer la suppression", cmd: "Get-Service LogiSyncStub"},
+    {text: "Alternative : réinstaller Logitech G Hub depuis le site officiel si le service est nécessaire"},
+  ]
 },
-{ id: 4, sev: "moyen", short: "Hotspot Shield — crash driver réseau kernel-level",
+{ id: 4, sev: "moyen", confidence: 80, short: "Hotspot Shield — crash driver réseau kernel-level",
   title: <>Hotspot Shield VPN — crash <code>cmw_srv.exe</code> répété</>,
   desc: <>Exception .NET <code>0xe0434352</code> via KERNELBASE.dll (Event ID 1000, 2026-04-21 00:22). VPN commercial avec driver réseau kernel-level — surface d'attaque élevée et télémétrie commerciale.</>,
-  reco: <>Désinstaller Hotspot Shield si non utilisé activement. Sinon, mettre à jour vers la dernière version.</>
+  reco: <>Désinstaller Hotspot Shield si non utilisé activement.</>,
+  steps: [
+    {text: "Vérifier si Hotspot Shield est actif", cmd: "Get-Process cmw_srv -ErrorAction SilentlyContinue"},
+    {text: "Désinstaller via PowerShell", cmd: "Get-Package 'Hotspot Shield' | Uninstall-Package"},
+    {text: "Ou désinstaller manuellement : Paramètres → Applications → Hotspot Shield → Désinstaller"},
+    {text: "Vérifier qu'aucun driver résidu ne reste", cmd: "Get-NetAdapter | Where-Object { $_.InterfaceDescription -match 'hotspot|anchor' }"},
+  ]
 },
-{ id: 5, sev: "moyen", short: "Riot Vanguard — 20+ crashes kernel en 7 jours",
+{ id: 5, sev: "moyen", confidence: 85, short: "Riot Vanguard — 20+ crashes kernel en 7 jours",
   title: <>Riot Vanguard <code>vgm.exe</code> — 20+ crashes kernel en 7 jours</>,
   desc: <>Exception <code>0xc0000409</code> (Stack Buffer Overrun) répété 20+ fois. Antitriche opérant en mode kernel (ring 0) — une instabilité persistante peut provoquer des BSOD ou compromettre l'intégrité du système.</>,
-  reco: <>Désinstaller et réinstaller Riot Vanguard. Si les crashs persistent, signaler à Riot Support et envisager de désactiver l'antitriche hors des sessions de jeu.</>
+  reco: <>Réinstaller Riot Vanguard proprement.</>,
+  steps: [
+    {text: "Désinstaller Vanguard depuis les applications Windows"},
+    {text: "Supprimer les résidus", cmd: "Remove-Item 'C:\\Program Files\\Riot Vanguard' -Recurse -Force -ErrorAction SilentlyContinue"},
+    {text: "Relancer Valorant pour déclencher le re-téléchargement automatique de Vanguard"},
+    {text: "Si les crashs persistent après réinstallation, signaler à Riot Support avec les dumps WER", cmd: 'Get-ChildItem "C:\\ProgramData\\Microsoft\\Windows\\WER\\ReportQueue" | Where-Object { $_.Name -match "vgm" }'},
+  ]
 },
-{ id: 6, sev: "info", short: "LG Monitor App Installer au démarrage",
+{ id: 6, sev: "info", confidence: 70, short: "LG Monitor App Installer au démarrage",
   title: <>LG Monitor App Installer au démarrage</>,
   desc: <><code>LG Monitor App Installer.lnk</code> présent dans <code>%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup</code>. Installeur relancé à chaque session — inutile si l'application est déjà installée.</>,
-  reco: <>Supprimer le raccourci via le Gestionnaire des tâches → Onglet Démarrage, ou manuellement dans le dossier Startup.</>
+  reco: <>Supprimer l'entrée de démarrage automatique.</>,
+  steps: [
+    {text: "Désactiver via le Gestionnaire des tâches : Ctrl+Shift+Échap → Démarrage → clic droit → Désactiver"},
+    {text: "Ou supprimer le raccourci manuellement", cmd: 'Remove-Item "$env:APPDATA\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\LG Monitor App Installer.lnk" -Force'},
+  ]
 },
-{ id: 7, sev: "info", short: "Disque H: à 82% de capacité",
+{ id: 7, sev: "info", confidence: 90, short: "Disque H: à 82% de capacité",
   title: <>Disque H: à 82% de capacité</>,
   desc: <>H: — 763,7 GB utilisés / 931,5 GB total → <strong>167,8 GB libres</strong>. Seuil d'alerte à 80%.</>,
-  reco: <>Archiver ou supprimer les fichiers volumineux non utilisés. Surveiller l'évolution.</>
+  reco: <>Libérer de l'espace disque.</>,
+  steps: [
+    {text: "Identifier les dossiers les plus volumineux", cmd: "Get-ChildItem H:\\ -Recurse -ErrorAction SilentlyContinue | Sort-Object Length -Descending | Select-Object -First 20 FullName, @{n='MB';e={[math]::Round($_.Length/1MB,1)}}"},
+    {text: "Vider la corbeille", cmd: "Clear-RecycleBin -DriveLetter H -Force -ErrorAction SilentlyContinue"},
+    {text: "Surveiller l'évolution dans le temps"},
+  ]
 },
-{ id: 8, sev: "info", short: "Erreurs ACPI RTC à chaque démarrage",
+{ id: 8, sev: "info", confidence: 60, short: "Erreurs ACPI RTC à chaque démarrage",
   title: <>Erreurs ACPI RTC à chaque démarrage — Event ID 21</>,
   desc: <>3 occurrences à chaque boot — l'horloge matérielle RTC ne peut pas être définie via ACPI. Code <code>0xC0000001</code>. Bénin dans la plupart des cas, mais peut indiquer un firmware BIOS à mettre à jour.</>,
-  reco: <>Vérifier les paramètres d'heure dans le BIOS/UEFI. Mettre à jour le firmware si une version récente est disponible.</>
+  reco: <>Vérifier et mettre à jour le firmware BIOS/UEFI si disponible.</>,
+  steps: [
+    {text: "Confirmer l'erreur dans les événements système", cmd: 'Get-WinEvent -LogName System | Where-Object { $_.Id -eq 21 } | Select-Object -First 5 TimeCreated, Message'},
+    {text: "Vérifier la version du BIOS actuelle", cmd: "Get-WmiObject Win32_BIOS | Select Manufacturer, SMBIOSBIOSVersion, ReleaseDate"},
+    {text: "Visiter le site du fabricant de la carte mère pour vérifier si une mise à jour BIOS est disponible"},
+    {text: "Si la pile CMOS est ancienne (>5 ans), la remplacer (CR2032, ~2€)"},
+  ]
 }];
 
 
@@ -437,13 +550,36 @@ const ScoreRing = React.memo(function ScoreRing({ score }) {
 });
 
 // ── CARTE D'ALERTE ────────────────────────────────────────────────
-function AlertCard({ alert }) {
-  const [open, setOpen] = useState(false);
+function ConfidenceBadge({ value }) {
+  const c = value || 70;
+  const cls = c >= 85 ? 'conf-high' : c >= 60 ? 'conf-medium' : 'conf-low';
   return (
-    <div className="alert-card">
-      <div className="alert-header" onClick={() => setOpen(o => !o)}>
+    <Tip text={`Confiance : ${c}%`}>
+      <span className={`confidence-badge ${cls}`}>{c}%</span>
+    </Tip>
+  );
+}
+
+function AlertCard({ alert, activeId, onActivate }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const isActive = activeId === alert.id;
+
+  useEffect(() => {
+    if (!isActive || !ref.current) return;
+    ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setOpen(true);
+    ref.current.classList.add('highlighted');
+    const t = setTimeout(() => { if (ref.current) ref.current.classList.remove('highlighted'); }, 1400);
+    return () => clearTimeout(t);
+  }, [isActive]);
+
+  return (
+    <div id={`alert-${alert.id}`} ref={ref} className="alert-card" onClick={() => onActivate && onActivate(alert.id)}>
+      <div className="alert-header" onClick={e => { e.stopPropagation(); setOpen(o => !o); }}>
         <div className={`sev-bar ${alert.sev}`} />
         <div className="alert-title-text">{alert.title}</div>
+        <ConfidenceBadge value={alert.confidence} />
         <div className={`alert-chevron${open ? ' open' : ''}`}>▼</div>
       </div>
       <div className={`alert-body${open ? ' open' : ''}`}>
@@ -451,28 +587,47 @@ function AlertCard({ alert }) {
         <div className="alert-reco">
           <div className="reco-label">Recommandation</div>
           <div className="reco-text">{alert.reco}</div>
+          {alert.steps && alert.steps.length > 0 && (
+            <ol className="steps-ol">
+              {alert.steps.map((s, i) => (
+                <li key={i} className="step-item">
+                  <span className="step-num">{i + 1}</span>
+                  <div className="step-body">
+                    {s.text}
+                    {s.cmd && <code className="step-cmd">{s.cmd}</code>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
     </div>);
 }
 
-function AbuseChip({ score }) {
-  const cls = score >= 30 ? 'abuse-bad' : score >= 10 ? 'abuse-warn' : 'abuse-ok';
-  return <span className={`abuse-chip ${cls}`}>{score}</span>;
+function RiskBadge({ score }) {
+  let cls, label;
+  if (score >= 80)      { cls = 'risk-crit';   label = `${score}%`; }
+  else if (score >= 30) { cls = 'risk-high';   label = `${score}%`; }
+  else if (score >= 10) { cls = 'risk-medium'; label = `${score}%`; }
+  else if (score > 0)   { cls = 'risk-low';    label = `${score}%`; }
+  else                  { cls = 'risk-clean';  label = '✓'; }
+  return <span className={`risk-badge ${cls}`}>{label}</span>;
 }
 
-function DiskBar({ label, pct }) {
+function DiskBar({ label, pct, used, total }) {
   const cls = pct >= 85 ? 'fill-danger' : pct >= 75 ? 'fill-warn' : 'fill-ok';
   const [w, setW] = useState(0);
   useEffect(() => { const t = setTimeout(() => setW(pct), 400); return () => clearTimeout(t); }, []);
+  const tip = used && total ? `${used} utilisés / ${total} total` : `${pct}%`;
   return (
-    <div className="disk-item-sm">
+    <Tip text={tip} className="disk-item-sm" style={{ display: 'block', marginBottom: 12, cursor: 'default' }}>
       <div className="disk-meta-sm">
         <span className="disk-label-sm">{label}</span>
         <span className="disk-stat-sm">{pct}%</span>
       </div>
       <div className="disk-bar"><div className={`disk-fill ${cls}`} style={{ width: `${w}%` }} /></div>
-    </div>);
+    </Tip>);
 }
 
 const SMART_TIPS = {
@@ -552,10 +707,30 @@ function RightPanel() {
     </div>);
 }
 
+// ── SEV GROUP (repliable) ─────────────────────────────────────────
+function SevGroup({ g, i, alerts, activeId, onActivate }) {
+  const [open, setOpen] = useState(true);
+  const items = alerts.filter(a => a.sev === g.key);
+  return (
+    <div style={{ marginTop: i > 0 ? 22 : 0 }}>
+      <div className={`section-title ${g.cls}`} onClick={() => setOpen(v => !v)}
+           style={{ cursor: 'pointer', userSelect: 'none' }}>
+        <span className="st-label">{g.label}</span>
+        <span className="st-count">{g.count}</span>
+        <span style={{ fontSize: 11, opacity: 0.45, marginLeft: 4,
+                       display: 'inline-block', transition: 'transform 0.2s',
+                       transform: open ? 'rotate(0deg)' : 'rotate(-90deg)' }}>▼</span>
+      </div>
+      {open && items.map(a => <AlertCard key={a.id} alert={a} activeId={activeId} onActivate={onActivate} />)}
+    </div>
+  );
+}
+
 // ── APP ──────────────────────────────────────────────────────────
 function App() {
   const SCORE = 72;
   const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [activeAlertId, setActiveAlertId] = useState(null);
   useEffect(() => {
     document.documentElement.removeAttribute('data-light');
     if (tweaks.theme === 'light') document.documentElement.setAttribute('data-light', '');
@@ -643,7 +818,13 @@ function App() {
         </div>
         <div className="sb-todo-list">
           {TODO.map(a =>
-            <div key={a.id} className="todo-item">
+            <div key={a.id} className={`todo-item${activeAlertId === a.id ? ' active' : ''}`}
+                 style={{ cursor: 'pointer' }}
+                 onClick={() => {
+                   setActiveAlertId(a.id);
+                   const el = document.getElementById(`alert-${a.id}`);
+                   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }}>
               <div className={`todo-sev-bar ${a.sev}`} />
               <span className="todo-text">{a.short}</span>
             </div>
@@ -670,15 +851,7 @@ function App() {
         </div>
 
         <div className="section" id="anomalies">
-          {sevGroups.map((g, i) =>
-            <div key={g.key}>
-              <div className={`section-title ${g.cls}`} style={{ marginTop: i > 0 ? 22 : 0 }}>
-                <span className="st-label">{g.label}</span>
-                <span className="st-count">{g.count}</span>
-              </div>
-              {ALERTS.filter(a => a.sev === g.key).map(a => <AlertCard key={a.id} alert={a} />)}
-            </div>
-          )}
+          {sevGroups.map((g, i) => <SevGroup key={g.key} g={g} i={i} alerts={ALERTS} activeId={activeAlertId} onActivate={setActiveAlertId} />)}
         </div>
 
         <div className="section" id="network">
@@ -688,23 +861,29 @@ function App() {
           <div className="table-card">
             <table className="data-table">
               <colgroup>
-                <col style={{width:'140px'}} /><col style={{width:'100px'}} />
-                <col style={{width:'44px'}} /><col style={{width:'148px'}} /><col />
+                <col style={{width:'130px'}} /><col style={{width:'64px'}} />
+                <col style={{width:'34px'}} /><col style={{width:'90px'}} />
+                <col style={{width:'130px'}} /><col />
               </colgroup>
-              <thead><tr><th>IP</th><th>ISP</th><th>Pays</th><th>Processus</th><th>Note</th></tr></thead>
+              <thead><tr><th>IP</th><th>Risque</th><th>Pays</th><th>Processus</th><th>ISP</th><th>Note</th></tr></thead>
               <tbody>
                 {NETWORK.map((r, i) =>
                   <tr key={i}>
-                    <td className="mono" style={{ color: 'var(--text)' }}>{r.ip}</td>
-                    <td style={{ color: 'var(--text-mid)', fontSize: '12px' }}>{r.isp}</td>
-                    <td style={{ fontSize: '14px', color: 'var(--text)' }}>{r.country}</td>
+                    <td className="mono" style={{ color: 'var(--text)', fontSize: '11px' }}>{r.ip}</td>
+                    <td><RiskBadge score={r.abuse} /></td>
+                    <td style={{ fontSize: '14px', color: 'var(--text)', textAlign: 'center' }}>{r.country}</td>
                     <td><span className="proc-tag">{r.proc}</span></td>
-                    <td><span className="note-text">{r.note}</span></td>
+                    <td style={{ color: 'var(--text-mid)', fontSize: '11px' }}>{r.isp}</td>
+                    <td>
+                      {r.note
+                        ? <Tip text={r.note}><span className="note-text" style={{ cursor: 'help', borderBottom: '1px dotted var(--border)' }}>{r.note.length > 48 ? r.note.slice(0, 45) + '…' : r.note}</span></Tip>
+                        : null}
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
-            
+            <div className="table-footnote">Score AbuseIPDB · ✓ = 0% · seuil alerte : ≥30% suspect, ≥80% malveillant</div>
           </div>
         </div>
       </main>
@@ -713,7 +892,13 @@ function App() {
     </>);
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(<ErrorBoundary><App /></ErrorBoundary>);
+} catch(e) {
+  var d = document.getElementById('err-root');
+  d.style.display = 'block';
+  d.textContent = '[REACT RENDER ERROR]\n' + (e && e.stack ? e.stack : String(e));
+}
 </script>
 </body>
 </html>
